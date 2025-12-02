@@ -15,14 +15,20 @@ class Auth {
 			return null; // No se necesita company_id aquí; se obtiene por session_id
 		}
 
-		$host = $_SERVER['HTTP_HOST'] ?? '';
-		$parts = explode('.', $host);
-
-		if (count($parts) > 2 || (count($parts) === 2 && $parts[0] !== 'www')) {
-			$subdomain = $parts[0];
-		} else {
-			return null;
-		}
+        // Opción 1: parámetro ?empresa= en la URL
+        if (isset($_GET['empresa'])) {
+            $subdomain = $_GET['empresa'];
+        }
+        // Opción 2: subdominio (para cuando puedas usarlo en producción)
+        else {
+            $host = $_SERVER['HTTP_HOST'] ?? '';
+            $parts = explode('.', $host);
+            if (count($parts) > 2 || (count($parts) === 2 && $parts[0] !== 'www')) {
+                $subdomain = $parts[0];
+            } else {
+                return null;
+            }
+        }
 
 		$stmt = self::$pdo->prepare("SELECT id FROM companies WHERE subdomain = ?");
 		$stmt->execute([$subdomain]);
