@@ -39,7 +39,6 @@ try {
     $stmt->execute([$user['company_id'], $user['id']]);
     $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
     // Obtener conversación seleccionada
     $selected_phone = $_GET['phone'] ?? ($contacts ? $contacts[0]['contact_phone'] : null);
     $messages = [];
@@ -110,6 +109,38 @@ try {
         $stmt->execute([$user['company_id'], $user['id'], $selected_phone]);
     }
 
+    // Función para obtener la clase de color
+    function getStatusColorClass($status) {
+        switch ($status) {
+            case 'interesado':
+                return 'text-green-600';
+            case 'no_interesa':
+                return 'text-red-600';
+            case 'vendido':
+                return 'text-green-800';
+            case 'contactar_despues':
+                return 'text-orange-600';
+            default:
+                return 'text-gray-400';
+        }
+    }
+
+    // Función para obtener el texto del estado
+    function getStatusText($status) {
+        switch ($status) {
+            case 'interesado':
+                return 'INTERESADO';
+            case 'no_interesa':
+                return 'NO LE INTERESA';
+            case 'vendido':
+                return 'LE VENDÍ';
+            case 'contactar_despues':
+                return 'CONTACTAR MÁS ADELANTE';
+            default:
+                return '';
+        }
+    }
+
     // Generar el contenido principal (solo lo que va dentro del layout)
     $contenido = '';
     if ($selected_phone):
@@ -139,13 +170,22 @@ try {
 
                         // Determinar color del icono según estado
                         $status = $contact['status'] ?? 'pendiente';
-                        $color_class = match($status) {
-                            'interesado' => 'bg-green-500',
-                            'no_interesa' => 'bg-red-500',
-                            'vendido' => 'bg-green-700',
-                            'contactar_despues' => 'bg-orange-500',
-                            default => 'bg-gray-400'
-                        };
+                        switch ($status) {
+                            case 'interesado':
+                                $color_class = 'bg-green-500';
+                                break;
+                            case 'no_interesa':
+                                $color_class = 'bg-red-500';
+                                break;
+                            case 'vendido':
+                                $color_class = 'bg-green-700';
+                                break;
+                            case 'contactar_despues':
+                                $color_class = 'bg-orange-500';
+                                break;
+                            default:
+                                $color_class = 'bg-gray-400';
+                        }
 
                         // Inicial del nombre completo
                         $initial = strtoupper(substr($full_name, 0, 1));
@@ -165,19 +205,7 @@ try {
                             </div>
                             <p class='text-sm text-gray-500 truncate'>" . htmlspecialchars($contact['contact_phone']) . "</p>
                             " . ($status !== 'pendiente' ? "
-                            <p class='text-xs font-medium " . match($status) {
-                                    'interesado' => 'text-green-600',
-                                    'no_interesa' => 'text-red-600',
-                                    'vendido' => 'text-green-800',
-                                    'contactar_despues' => 'text-orange-600',
-                                    default => 'text-gray-400'
-                                } . "'>" . match($status) {
-                                    'interesado' => 'INTERESADO',
-                                    'no_interesa' => 'NO LE INTERESA',
-                                    'vendido' => 'LE VENDÍ',
-                                    'contactar_despues' => 'CONTACTAR MÁS ADELANTE',
-                                    default => ''
-                                } . "</p>" : '') . "
+                            <p class='text-xs font-medium " . getStatusColorClass($status) . "'>" . getStatusText($status) . "</p>" : '') . "
                         </div>
                     </a>";
                     }

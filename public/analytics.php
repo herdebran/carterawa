@@ -166,14 +166,23 @@ $contenido = '
                                 $name = trim(($conv['contact_name'] ?? '') . ' ' . ($conv['contact_lastname'] ?? ''));
                                 if (!$name) $name = $conv['contact_phone'];
                                 
-                                $status_label = match($conv['status'] ?? 'pendiente') {
-                                    'interesado' => '<span class="text-green-600">INTERESADO</span>',
-                                    'no_interesa' => '<span class="text-red-600">NO LE INTERESA</span>',
-                                    'vendido' => '<span class="text-blue-700">LE VENDÍ</span>',
-                                    'contactar_despues' => '<span class="text-yellow-600">CONTACTAR MÁS ADELANTE</span>',
-                                    default => '<span class="text-gray-400">Sin clasificar</span>'
-                                };
-                                
+                                switch ($conv['status'] ?? 'pendiente') {
+                                    case 'interesado':
+                                        $status_label = '<span class="text-green-600">INTERESADO</span>';
+                                        break;
+                                    case 'no_interesa':
+                                        $status_label = '<span class="text-red-600">NO LE INTERESA</span>';
+                                        break;
+                                    case 'vendido':
+                                        $status_label = '<span class="text-blue-700">LE VENDÍ</span>';
+                                        break;
+                                    case 'contactar_despues':
+                                        $status_label = '<span class="text-yellow-600">CONTACTAR MÁS ADELANTE</span>';
+                                        break;
+                                    default:
+                                        $status_label = '<span class="text-gray-400">Sin clasificar</span>';
+                                }
+
                                 $html .= '
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 whitespace-nowrap">' . htmlspecialchars($name) . '</td>
