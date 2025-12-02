@@ -12,6 +12,38 @@ if ($user['role'] !== 'admin') {
     exit;
 }
 
+// Función para obtener la clase de color del estado
+function getStatusColorClass($status) {
+    switch ($status) {
+        case 'interesado':
+            return 'text-green-600';
+        case 'no_interesa':
+            return 'text-red-600';
+        case 'vendido':
+            return 'text-blue-600';
+        case 'contactar_despues':
+            return 'text-yellow-600';
+        default:
+            return 'text-gray-400';
+    }
+}
+
+// Función para obtener el texto del estado
+function getStatusText($status) {
+    switch ($status) {
+        case 'interesado':
+            return 'INTERESADO';
+        case 'no_interesa':
+            return 'NO INTERESA';
+        case 'vendido':
+            return 'LE VENDÍ';
+        case 'contactar_despues':
+            return 'CONTACTAR MÁS ADELANTE';
+        default:
+            return 'Sin clasificar';
+    }
+}
+
 // Obtener nombre de la empresa
 $stmt = $pdo->prepare("SELECT name FROM companies WHERE id = ?");
 $stmt->execute([$user['company_id']]);
@@ -137,17 +169,9 @@ $contenido = '
                             <td class="px-4 py-3 whitespace-nowrap">' . ($p['reparticion'] ? htmlspecialchars($p['reparticion']) : '<span class="text-gray-400">—</span>') . '</td>
                             <td class="px-4 py-3 whitespace-nowrap">' . $last_contact . '</td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                ' . (
-            isset($p['status'])
-                ? match($p['status']) {
-                'interesado' => '<span class="text-green-600 font-medium">INTERESADO</span>',
-                'no_interesa' => '<span class="text-red-600 font-medium">NO INTERESA</span>',
-                'vendido' => '<span class="text-blue-600 font-medium">LE VENDÍ</span>',
-                'contactar_despues' => '<span class="text-yellow-600 font-medium">CONTACTAR MÁS ADELANTE</span>',
-                default => '<span class="text-gray-400">Sin clasificar</span>'
-            }
-                : '<span class="text-gray-400">Sin clasificar</span>'
-            ) . '
+                                <span class="' . getStatusColorClass($p['status'] ?? 'pendiente') . ' font-medium">' .
+                                        getStatusText($p['status'] ?? 'pendiente') .
+                                        '</span>
                             </td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
                                 <a href="/conversations.php?phone=' . urlencode($p['phone']) . '" 
