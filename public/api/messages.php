@@ -20,6 +20,13 @@ if (!isset($input['data']['key']['remoteJid'])) {
     exit;
 }
 
+// VERIFICAR SI ES MENSAJE ENTRANTE (sino pasa de largo)
+if (isset($input['data']['key']['fromMe']) && $input['data']['key']['fromMe'] === true) {
+    // Es un mensaje saliente, no lo procesamos
+    http_response_code(200);
+    exit;
+}
+
 $remoteJid = $input['data']['key']['remoteJid'];
 $contact_phone = preg_replace('/[^0-9]/', '', explode('@', $remoteJid)[0]);
 $content = $input['data']['message']['conversation'] ??
