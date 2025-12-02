@@ -12,6 +12,20 @@ if ($user['role'] !== 'admin') {
     exit;
 }
 
+// Función para obtener el mensaje de éxito
+function getSuccessMessage($msg) {
+    switch ($msg) {
+        case 'created':
+            return 'Plantilla creada exitosamente.';
+        case 'updated':
+            return 'Plantilla actualizada.';
+        case 'deleted':
+            return 'Plantilla eliminada.';
+        default:
+            return '';
+    }
+}
+
 // Obtener empresa
 $stmt = $pdo->prepare("SELECT name FROM companies WHERE id = ?");
 $stmt->execute([$user['company_id']]);
@@ -48,13 +62,10 @@ $contenido = '
 
 // Mostrar mensaje
 if ($message) {
-    $msg_text = match($message) {
-        'created' => 'Plantilla creada exitosamente.',
-        'updated' => 'Plantilla actualizada.',
-        'deleted' => 'Plantilla eliminada.',
-        default => ''
-    };
-    $contenido .= '<div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg">' . $msg_text . '</div>';
+    $msg_text = getSuccessMessage($message);
+    if ($msg_text) {
+        $contenido .= '<div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg">' . $msg_text . '</div>';
+    }
 }
 
 // Formulario
