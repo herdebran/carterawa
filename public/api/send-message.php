@@ -36,6 +36,12 @@ if (!$phone || !$text) {
     exit;
 }
 
+//Procesar saltos de línea
+$text = str_replace('\r\n', "\n", $text);
+$text = str_replace('\r', "\n", $text);
+$text = str_replace('\n', "\n", $text);
+$text = implode("\n", array_map('trim', explode("\n", $text)));
+
 $whatsapp_config = require __DIR__ . '/../../app/config/whatsapp.php';
 $BASE_URL = $whatsapp_config['base_url'];
 $API_TOKEN = $whatsapp_config['api_token'];
